@@ -10,7 +10,7 @@ import (
 )
 
 func Run() {
-	srv := server.New("8080")
+	srv := server.New()
 
 	r := srv.Router()
 	r.Use(chi_middleware.RequestID)
@@ -24,5 +24,5 @@ func Run() {
 		w.Write([]byte("pong"))
 	})
 
-	srv.Run()
+	srv.Run("8080")
 }

@@ -8,5 +8,5 @@ type contextKey struct {
 }
 
 func (k *contextKey) String() string {
-	return "j-middleware/middleware context value " + k.name
+	return "middleware/middleware context value " + k.name
 }

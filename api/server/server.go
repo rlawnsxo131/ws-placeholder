@@ -18,12 +18,11 @@ type server struct {
 	srv *http.Server
 }
 
-func New(port string) *server {
+func New() *server {
 	r := chi.NewRouter()
 	return &server{
 		r: r,
 		srv: &http.Server{
-			Addr:    "0.0.0.0" + ":" + port,
 			Handler: r,
 		},
 	}
@@ -33,7 +32,10 @@ func (s *server) Router() *chi.Mux {
 	return s.r
 }
 
-func (s *server) Run() {
+func (s *server) Run(port string) {
+	s.srv.Addr = "0.0.0.0" + ":" + port
+	logger.Default().Info().Msgf("set Addr %s", s.srv.Addr)
+
 	serverCtx, serverStopCtx := context.WithCancel(context.Background())
 
 	sig := make(chan os.Signal, 1)

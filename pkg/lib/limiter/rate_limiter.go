@@ -13,7 +13,7 @@ type visitor struct {
 	lastSeen time.Time
 }
 
-type memoryStore struct {
+type RateLimiterMemoryStore struct {
 	visitors map[string]*visitor
 	mutex    sync.Mutex
 	rate     rate.Limit // for more info check out Limiter docs - https://pkg.go.dev/golang.org/x/time/rate#Limit.
@@ -25,8 +25,8 @@ type memoryStore struct {
 	timeNow func() time.Time
 }
 
-func NewRateLimiterMemoryStore(r rate.Limit) *memoryStore {
-	store := &memoryStore{}
+func NewRateLimiterMemoryStore(r rate.Limit) *RateLimiterMemoryStore {
+	store := &RateLimiterMemoryStore{}
 	store.rate = r
 	store.burst = int(r)
 	store.expiresIn = 3 * time.Minute
@@ -37,7 +37,7 @@ func NewRateLimiterMemoryStore(r rate.Limit) *memoryStore {
 	return store
 }
 
-func (store *memoryStore) Allow(identifier string) bool {
+func (store *RateLimiterMemoryStore) Allow(identifier string) bool {
 	store.mutex.Lock()
 	defer store.mutex.Unlock()
 
