@@ -1,0 +1,151 @@
+package middleware
+
+import (
+	"context"
+	"io"
+	"net/http"
+	"os"
+	"time"
+
+	chi_middleware "github.com/go-chi/chi/v5/middleware"
+	"github.com/rlawnsxo131/ws-placeholder/pkg/constants"
+	"github.com/rs/zerolog"
+)
+
+var (
+	HTTPLogEntryCtxKey     = &contextKey{"HTTPLogEntryCtxKey"}
+	DefaultHTTPServeLogger = NewHTTPServeLogger(os.Stdout, NewDefaultHTTPLogFormatter())
+)
+
+func HTTPLogger(logger *HTTPServeLogger) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			entry := logger.NewLogEntry(r)
+			writer := NewHTTPLogResponseWriter(
+				chi_middleware.NewWrapResponseWriter(w, r.ProtoMajor),
+				entry,
+			)
+
+			t := time.Now()
+			defer func() {
+				entry.Write(t)
+			}()
+
+			next.ServeHTTP(writer, WithHTTPLogEntry(r, entry))
+		})
+	}
+}
+
+type HTTPServeLogger struct {
+	l *zerolog.Logger
+	f HTTPLogFormatter
+}
+
+func NewHTTPServeLogger(w io.Writer, f HTTPLogFormatter) *HTTPServeLogger {
+	l := zerolog.New(w).With().Caller().Timestamp().Logger()
+	return &HTTPServeLogger{
+		l: &l,
+		f: f,
+	}
+}
+
+func (l *HTTPServeLogger) NewLogEntry(r *http.Request) HTTPLogEntry {
+	return l.f.NewLogEntry(l.l, r)
+}
+
+type HTTPLogFormatter interface {
+	NewLogEntry(l *zerolog.Logger, r *http.Request) HTTPLogEntry
+}
+
+type HTTPLogEntry interface {
+	Add(f func(e *zerolog.Event))
+	Write(t time.Time)
+}
+
+func GetHTTPLogEntry(r *http.Request) HTTPLogEntry {
+	entry, _ := r.Context().Value(HTTPLogEntryCtxKey).(HTTPLogEntry)
+	return entry
+}
+
+func WithHTTPLogEntry(r *http.Request, entry HTTPLogEntry) *http.Request {
+	r = r.WithContext(context.WithValue(r.Context(), HTTPLogEntryCtxKey, entry))
+	return r
+}
+
+type DefaultHTTPLogFormatter struct {
+	HTTPLogFormatter
+}
+
+func NewDefaultHTTPLogFormatter() *DefaultHTTPLogFormatter {
+	return &DefaultHTTPLogFormatter{}
+}
+
+func (f *DefaultHTTPLogFormatter) NewLogEntry(l *zerolog.Logger, r *http.Request) HTTPLogEntry {
+	return &DefaultHTTPLogEntry{
+		l:   l,
+		r:   r,
+		add: []func(e *zerolog.Event){},
+	}
+}
+
+type DefaultHTTPLogEntry struct {
+	l   *zerolog.Logger
+	r   *http.Request
+	add []func(e *zerolog.Event)
+}
+
+func (le *DefaultHTTPLogEntry) Add(f func(e *zerolog.Event)) {
+	le.add = append(le.add, f)
+}
+
+func (le *DefaultHTTPLogEntry) Write(t time.Time) {
+	e := le.l.Log().
+		Str("time", t.Format(time.RFC3339Nano)).
+		Str("request-id", chi_middleware.GetReqID(le.r.Context())).
+		Dur("elapsed(ms)", time.Since(t)).
+		Str("method", le.r.Method).
+		Str("uri", le.r.RequestURI).
+		// Str("request-body", le.reqBody).
+		Str("origin", le.r.Header.Get(constants.HeaderOrigin)).
+		Str("host", le.r.Host).
+		Str("referer", le.r.Referer()).
+		Str("remote-ip", le.r.RemoteAddr).
+		Str("x-requiest-id", le.r.Header.Get(constants.HeaderXRequestID)).
+		Str("x-forwarded-for", le.r.Header.Get(constants.HeaderXForwardedFor))
+
+	for _, f := range le.add {
+		f(e)
+	}
+
+	e.Send()
+}
+
+type HTTPLogResponseWriter struct {
+	w  http.ResponseWriter
+	le HTTPLogEntry
+}
+
+func NewHTTPLogResponseWriter(w http.ResponseWriter, le HTTPLogEntry) http.ResponseWriter {
+	return &HTTPLogResponseWriter{
+		w:  w,
+		le: le,
+	}
+}
+
+func (lw *HTTPLogResponseWriter) Write(buf []byte) (int, error) {
+	lw.le.Add(func(e *zerolog.Event) {
+		e.Bytes("response", buf)
+	})
+	return lw.w.Write(buf)
+}
+
+func (lw *HTTPLogResponseWriter) Header() http.Header {
+	return lw.w.Header()
+}
+
+func (lw *HTTPLogResponseWriter) WriteHeader(statusCode int) {
+	lw.le.Add(func(e *zerolog.Event) {
+		e.Int("status", statusCode)
+	})
+	lw.w.WriteHeader(statusCode)
+}
