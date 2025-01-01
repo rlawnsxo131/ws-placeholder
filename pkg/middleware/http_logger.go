@@ -110,7 +110,7 @@ func (le *DefaultHTTPLogEntry) Write(t time.Time) {
 		Str("host", le.r.Host).
 		Str("referer", le.r.Referer()).
 		Str("remote-ip", le.r.RemoteAddr).
-		Str("x-requiest-id", le.r.Header.Get(constants.HeaderXRequestID)).
+		Str("x-request-id", le.r.Header.Get(constants.HeaderXRequestID)).
 		Str("x-forwarded-for", le.r.Header.Get(constants.HeaderXForwardedFor))
 
 	for _, f := range le.add {
