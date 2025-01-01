@@ -40,30 +40,28 @@ func Run(port string) {
 		})
 	})
 
-	r.Route("/api", func(r chi.Router) {
+	r.With(middleware.HTTPContentType).
+		Route("/api", func(r chi.Router) {
+			r.Route("/v1", func(r chi.Router) {
 
-		r.Route("/v1", func(r chi.Router) {
-			r.Use(middleware.HTTPContentType)
+				r.Route("/chat", func(r chi.Router) {
+					r.Route("/room", func(r chi.Router) {
 
-			r.Route("/chat", func(r chi.Router) {
+						r.Post("/", func(w http.ResponseWriter, r *http.Request) {
+							w.WriteHeader(http.StatusOK)
+							w.Write([]byte("roomId"))
+						})
+						r.Delete("/{roomId}", func(w http.ResponseWriter, r *http.Request) {
+							roomId := chi.URLParam(r, "roomId")
+							w.WriteHeader(http.StatusOK)
+							w.Write([]byte(roomId))
+						})
 
-				r.Route("/room", func(r chi.Router) {
-					r.Post("/", func(w http.ResponseWriter, r *http.Request) {
-						w.WriteHeader(http.StatusOK)
-						w.Write([]byte("roomId"))
-					})
-
-					r.Delete("/{roomId}", func(w http.ResponseWriter, r *http.Request) {
-						roomId := chi.URLParam(r, "roomId")
-						w.WriteHeader(http.StatusOK)
-						w.Write([]byte(roomId))
 					})
 				})
 
 			})
 		})
-
-	})
 
 	srv.Run(port)
 }
