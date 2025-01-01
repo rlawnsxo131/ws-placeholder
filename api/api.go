@@ -38,15 +38,16 @@ func Run(port string) {
 	})
 
 	r.Route("/ws", func(r chi.Router) {
+
 		r.Get("/echo", func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte("/ws/echo"))
 		})
-
 		r.Get("/chat", func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte("/ws/chat"))
 		})
+
 	})
 
 	r.With(middleware.HTTPContentType).
