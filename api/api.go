@@ -13,8 +13,17 @@ import (
 
 func Run(port string) {
 	srv := server.New()
-
 	r := srv.Router()
+
+	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte(http.StatusText(http.StatusNotFound)))
+	})
+	r.MethodNotAllowed(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		w.Write([]byte(http.StatusText(http.StatusMethodNotAllowed)))
+	})
+
 	r.Use(chi_middleware.RequestID)
 	r.Use(middleware.HTTPXRequestID)
 	r.Use(chi_middleware.RealIP)
