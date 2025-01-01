@@ -11,7 +11,7 @@ func HTTPContentType(next http.Handler) http.Handler {
 		if contentType := r.Header.Get(constants.HeaderContentType); contentType != "" {
 			w.Header().Set(constants.HeaderContentType, contentType)
 		} else {
-			w.Header().Set(constants.HeaderContentType, "application/json")
+			w.Header().Set(constants.HeaderContentType, "application/json; charset=utf-8")
 		}
 		next.ServeHTTP(w, r)
 	})
