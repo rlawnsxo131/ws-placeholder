@@ -23,7 +23,10 @@ func New() *server {
 	return &server{
 		r: r,
 		srv: &http.Server{
-			Handler: r,
+			Handler:      r,
+			ReadTimeout:  time.Second * 5,
+			WriteTimeout: time.Second * 5,
+			IdleTimeout:  time.Second * 10,
 		},
 	}
 }

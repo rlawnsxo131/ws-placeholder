@@ -11,6 +11,7 @@ const (
 	HeaderOrigin        = "Origin"
 	HeaderXRequestID    = "X-Request-Id"
 	HeaderXForwardedFor = "X-Forwarded-For"
+	HeaderContentType   = "Content-Type"
 
 	// Access control
 	HeaderAccessControlRequestMethod    = "Access-Control-Request-Method"

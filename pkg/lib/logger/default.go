@@ -10,21 +10,21 @@ import (
 
 var (
 	_onceDefaultLogger      sync.Once
-	_singletonDefaultLogger *defaultLogger
+	_singletonDefaultLogger *DefaultLogger
 )
 
-func Default() *defaultLogger {
+func Default() *DefaultLogger {
 	_onceDefaultLogger.Do(func() {
 		_singletonDefaultLogger = NewDefaultLogger(os.Stdout)
 	})
 	return _singletonDefaultLogger
 }
 
-type defaultLogger struct {
+type DefaultLogger struct {
 	*zerolog.Logger
 }
 
-func NewDefaultLogger(w io.Writer) *defaultLogger {
+func NewDefaultLogger(w io.Writer) *DefaultLogger {
 	l := zerolog.New(w).With().Caller().Timestamp().Logger()
-	return &defaultLogger{&l}
+	return &DefaultLogger{&l}
 }
