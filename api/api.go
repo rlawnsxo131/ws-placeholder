@@ -60,10 +60,6 @@ func Run(port string) {
 			r.Route("/chat", func(r chi.Router) {
 				r.Route("/room", func(r chi.Router) {
 
-					r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-						w.WriteHeader(http.StatusOK)
-						w.Write([]byte("roomId"))
-					})
 					r.Post("/", func(w http.ResponseWriter, r *http.Request) {
 						w.WriteHeader(http.StatusOK)
 						w.Write([]byte("roomId"))
@@ -73,7 +69,10 @@ func Run(port string) {
 						w.WriteHeader(http.StatusOK)
 						w.Write([]byte(roomId))
 					})
-
+					r.Get("/list", func(w http.ResponseWriter, r *http.Request) {
+						w.WriteHeader(http.StatusOK)
+						w.Write([]byte("roomList"))
+					})
 				})
 			})
 
