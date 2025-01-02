@@ -1,14 +1,14 @@
 package middleware
 
 // [Full order example]
-// r.Use(chi_middleware.RequestID)
+// r.Use(middleware.HTTPRequestID)
 // r.Use(middleware.HTTPXRequestID)
-// r.Use(chi_middleware.RealIP)
-// r.Use(chi_middleware.Compress(5))
+// r.Use(middleware.HTTPRealIP)
+// r.Use(middleware.HTTPCompress(5))
 // r.Use(middleware.HTTPLogger(middleware.DefaultHTTPServeLogger))
 // r.Use(middleware.HTTPTimeout(time.Second * 3))
 // r.Use(middleware.HTTPContentType)
-// r.Use(chi_middleware.Recoverer)
+// r.Use(middleware.HTTPRecoverer)
 
 // contextKey is a value for use with context.WithValue. It's used as
 // a pointer so it fits in an interface{} without allocation. This technique
@@ -18,5 +18,5 @@ type contextKey struct {
 }
 
 func (k *contextKey) String() string {
-	return "middleware/middleware context value " + k.name
+	return "pkg/middleware context value " + k.name
 }

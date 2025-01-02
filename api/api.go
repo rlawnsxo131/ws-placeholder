@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	chi_middleware "github.com/go-chi/chi/v5/middleware"
 
 	"github.com/rlawnsxo131/ws-placeholder/api/server"
 	"github.com/rlawnsxo131/ws-placeholder/pkg/middleware"
@@ -15,13 +14,13 @@ func Run(port string) {
 	srv := server.New()
 	r := srv.Router()
 
-	r.Use(chi_middleware.RequestID)
+	r.Use(middleware.HTTPRequestID)
 	r.Use(middleware.HTTPXRequestID)
-	r.Use(chi_middleware.RealIP)
-	r.Use(chi_middleware.Compress(5))
+	r.Use(middleware.HTTPRealIP)
+	r.Use(middleware.HTTPCompress(5))
 	r.Use(middleware.HTTPLogger(middleware.DefaultHTTPServeLogger))
 	r.Use(middleware.HTTPTimeout(time.Second * 3))
-	r.Use(chi_middleware.Recoverer)
+	r.Use(middleware.HTTPRecoverer)
 
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
@@ -37,7 +36,9 @@ func Run(port string) {
 		w.Write([]byte("pong"))
 	})
 
-	r.Route("/ws", func(r chi.Router) {
+	r.With(
+		middleware.CORS,
+	).Route("/ws", func(r chi.Router) {
 
 		r.Get("/echo", func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
@@ -59,6 +60,10 @@ func Run(port string) {
 			r.Route("/chat", func(r chi.Router) {
 				r.Route("/room", func(r chi.Router) {
 
+					r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+						w.WriteHeader(http.StatusOK)
+						w.Write([]byte("roomId"))
+					})
 					r.Post("/", func(w http.ResponseWriter, r *http.Request) {
 						w.WriteHeader(http.StatusOK)
 						w.Write([]byte("roomId"))
