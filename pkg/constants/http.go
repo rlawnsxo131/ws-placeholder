@@ -12,6 +12,7 @@ const (
 	HeaderXRequestID    = "X-Request-Id"
 	HeaderXForwardedFor = "X-Forwarded-For"
 	HeaderContentType   = "Content-Type"
+	HeaderCookie        = "Cookie"
 
 	// Access control
 	HeaderAccessControlRequestMethod    = "Access-Control-Request-Method"

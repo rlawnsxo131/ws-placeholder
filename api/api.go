@@ -7,6 +7,7 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	"github.com/rlawnsxo131/ws-placeholder/api/server"
+	"github.com/rlawnsxo131/ws-placeholder/pkg/constants"
 	"github.com/rlawnsxo131/ws-placeholder/pkg/middleware"
 )
 
@@ -20,6 +21,16 @@ func Run(port string) {
 	r.Use(middleware.HTTPCompress(5))
 	r.Use(middleware.HTTPLogger(middleware.DefaultHTTPServeLogger))
 	r.Use(middleware.HTTPTimeout(time.Second * 3))
+	r.Use(middleware.CorsHandler(middleware.CorsOptions{
+		AllowedOrigins: []string{"https://*", "http://*"},
+		AllowedMethods: []string{"GET", "POST", "DELETE", "OPTIONS"},
+		AllowedHeaders: []string{
+			constants.HeaderContentType,
+			constants.HeaderAccessControlAllowCredentials,
+			constants.HeaderXForwardedFor,
+		},
+		MaxAge: 300,
+	}))
 	r.Use(middleware.HTTPRecoverer)
 
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
@@ -36,9 +47,7 @@ func Run(port string) {
 		w.Write([]byte("pong"))
 	})
 
-	r.With(
-		middleware.CORS,
-	).Route("/ws", func(r chi.Router) {
+	r.Route("/ws", func(r chi.Router) {
 
 		r.Get("/echo", func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
@@ -51,10 +60,9 @@ func Run(port string) {
 
 	})
 
-	r.With(
-		middleware.CORS,
-		middleware.HTTPContentType,
-	).Route("/api", func(r chi.Router) {
+	r.Route("/api", func(r chi.Router) {
+		r.Use(middleware.HTTPContentType)
+
 		r.Route("/v1", func(r chi.Router) {
 
 			r.Route("/chat", func(r chi.Router) {
