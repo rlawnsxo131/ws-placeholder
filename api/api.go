@@ -22,6 +22,7 @@ func Run(port string) {
 	r.Use(middleware.HTTPCompress(5))
 	r.Use(middleware.HTTPLogger(middleware.DefaultHTTPServeLogger))
 	r.Use(middleware.HTTPTimeout(time.Second * 3))
+	// @TODO Allow 헤더등 표준에 약간 아쉬운게 있어서 직접 구현하기
 	r.Use(middleware.CorsHandler(middleware.CorsOptions{
 		AllowedOrigins: []string{"https://*", "http://*"},
 		AllowedMethods: []string{"GET", "POST", "DELETE", "OPTIONS"},
@@ -50,7 +51,7 @@ func Run(port string) {
 	r.Mount("/", root)
 
 	ws := chi.NewRouter()
-	handler.NewWSHandler().ApplyRoutes(r)
+	handler.NewWSHandler().ApplyRoutes(ws)
 	r.Mount("/ws", ws)
 
 	api := chi.NewRouter().With(middleware.HTTPContentType)
