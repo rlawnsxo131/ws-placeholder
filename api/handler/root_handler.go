@@ -13,9 +13,7 @@ func NewRootHandler() *rootHandler {
 }
 
 func (h *rootHandler) ApplyRoutes(r chi.Router) {
-	r.Route("/", func(r chi.Router) {
-		r.Get("/ping", h.getPing())
-	})
+	r.Get("/ping", h.getPing())
 }
 
 func (h *rootHandler) getPing() http.HandlerFunc {

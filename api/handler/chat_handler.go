@@ -17,7 +17,7 @@ func (h *chatHandler) ApplyRoutes(r chi.Router) {
 		r.Route("/room", func(r chi.Router) {
 			r.Post("/", h.postRoom())
 			r.Delete("/{roomId}", h.deleteRoom())
-			r.Get("/list", h.getList())
+			r.Get("/list", h.getRoomList())
 		})
 	})
 }
@@ -37,7 +37,7 @@ func (h *chatHandler) deleteRoom() http.HandlerFunc {
 	}
 }
 
-func (h *chatHandler) getList() http.HandlerFunc {
+func (h *chatHandler) getRoomList() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("roomList"))

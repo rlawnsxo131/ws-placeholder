@@ -34,7 +34,7 @@ func Run(port string) {
 	}))
 	r.Use(middleware.HTTPRecoverer)
 
-	// chi  default handler
+	// chi default handler
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte(http.StatusText(http.StatusNotFound)))
@@ -45,14 +45,17 @@ func Run(port string) {
 	})
 
 	// handlers
-	handler.NewRootHandler().ApplyRoutes(r)
+	root := chi.NewRouter()
+	handler.NewRootHandler().ApplyRoutes(root)
+	r.Mount("/", root)
+
+	ws := chi.NewRouter()
 	handler.NewWSHandler().ApplyRoutes(r)
+	r.Mount("/ws", ws)
 
-	r.Route("/api", func(r chi.Router) {
-		r.Use(middleware.HTTPContentType)
-
-		handler.NewChatHandler().ApplyRoutes(r)
-	})
+	api := chi.NewRouter().With(middleware.HTTPContentType)
+	handler.NewChatHandler().ApplyRoutes(api)
+	r.Mount("/api", api)
 
 	srv.Run(port)
 }

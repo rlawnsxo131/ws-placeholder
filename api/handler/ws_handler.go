@@ -13,10 +13,8 @@ func NewWSHandler() *wsHandler {
 }
 
 func (h *wsHandler) ApplyRoutes(r chi.Router) {
-	r.Route("/ws", func(r chi.Router) {
-		r.Get("/echo", h.getEcho())
-		r.Get("/chat", h.getChat())
-	})
+	r.Get("/echo", h.getEcho())
+	r.Get("/chat", h.getChat())
 }
 
 func (h *wsHandler) getEcho() http.HandlerFunc {
