@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
+	"github.com/rlawnsxo131/ws-placeholder/api/handler"
 	"github.com/rlawnsxo131/ws-placeholder/api/server"
 	"github.com/rlawnsxo131/ws-placeholder/pkg/constants"
 	"github.com/rlawnsxo131/ws-placeholder/pkg/middleware"
@@ -33,6 +34,7 @@ func Run(port string) {
 	}))
 	r.Use(middleware.HTTPRecoverer)
 
+	// chi  default handler
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte(http.StatusText(http.StatusNotFound)))
@@ -42,50 +44,14 @@ func Run(port string) {
 		w.Write([]byte(http.StatusText(http.StatusMethodNotAllowed)))
 	})
 
-	r.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("pong"))
-	})
-
-	r.Route("/ws", func(r chi.Router) {
-
-		r.Get("/echo", func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte("/ws/echo"))
-		})
-		r.Get("/chat", func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte("/ws/chat"))
-		})
-
-	})
+	// handlers
+	handler.NewRootHandler().ApplyRoutes(r)
+	handler.NewWSHandler().ApplyRoutes(r)
 
 	r.Route("/api", func(r chi.Router) {
 		r.Use(middleware.HTTPContentType)
 
-		r.Route("/v1", func(r chi.Router) {
-
-			r.Route("/chat", func(r chi.Router) {
-				r.Route("/room", func(r chi.Router) {
-
-					r.Post("/", func(w http.ResponseWriter, r *http.Request) {
-						w.WriteHeader(http.StatusOK)
-						w.Write([]byte("roomId"))
-					})
-					r.Delete("/{roomId}", func(w http.ResponseWriter, r *http.Request) {
-						roomId := chi.URLParam(r, "roomId")
-						w.WriteHeader(http.StatusOK)
-						w.Write([]byte(roomId))
-					})
-					r.Get("/list", func(w http.ResponseWriter, r *http.Request) {
-						w.WriteHeader(http.StatusOK)
-						w.Write([]byte("roomList"))
-					})
-
-				})
-			})
-
-		})
+		handler.NewChatHandler().ApplyRoutes(r)
 	})
 
 	srv.Run(port)
