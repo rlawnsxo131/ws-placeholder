@@ -52,6 +52,10 @@ func Run(port string) {
 	handler.NewRootHandler().ApplyRoutes(root)
 	r.Mount("/", root)
 
+	internal := chi.NewRouter()
+	handler.NewInternalHander().ApplyRoutes(internal)
+	r.Mount("/internal", internal)
+
 	ws := chi.NewRouter()
 	handler.NewWSHandler().ApplyRoutes(ws)
 	r.Mount("/ws", ws)
