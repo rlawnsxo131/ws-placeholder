@@ -27,7 +27,6 @@ func (h *chatHandler) postRoom() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("roomId"))
-		// json.NewEncoder(w).Encode(map[string]string{"name": "value"})
 	}
 }
 
