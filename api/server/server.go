@@ -71,5 +71,4 @@ func (s *server) Run(port string) {
 	// Wait for server context to be stopped
 	<-serverCtx.Done()
 	logger.Default().Info().Msg("Server gracefully stopped")
-
 }

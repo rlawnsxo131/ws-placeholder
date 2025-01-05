@@ -20,7 +20,6 @@ func (h *chatHandler) ApplyRoutes(r chi.Router) {
 	r.Route("/rooms", func(r chi.Router) {
 		r.Get("/", h.getRooms())
 	})
-
 }
 
 func (h *chatHandler) postRoom() http.HandlerFunc {
