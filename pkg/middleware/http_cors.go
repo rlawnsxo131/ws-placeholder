@@ -69,11 +69,6 @@ func HTTPCors(config HTTPCorsConfig) func(http.Handler) http.Handler {
 				w.Write([]byte(http.StatusText(http.StatusNoContent)))
 				return
 			}
-			if !preflight && r.Header.Get(constants.HeaderContentType) == "" {
-				w.WriteHeader(http.StatusBadRequest)
-				w.Write([]byte(http.StatusText(http.StatusBadRequest)))
-				return
-			}
 
 			for _, o := range config.AllowOrigins {
 				if o == "*" && config.AllowCredentials {
