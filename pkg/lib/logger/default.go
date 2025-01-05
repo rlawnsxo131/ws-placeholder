@@ -4,6 +4,7 @@ import (
 	"io"
 	"os"
 	"sync"
+	"time"
 
 	"github.com/rs/zerolog"
 )
@@ -25,6 +26,7 @@ type DefaultLogger struct {
 }
 
 func NewDefaultLogger(w io.Writer) *DefaultLogger {
-	l := zerolog.New(w).With().Caller().Timestamp().Logger()
+	// ko: +9 hours
+	l := zerolog.New(w).With().Caller().Str("time", time.Now().UTC().Format(time.RFC3339Nano)).Logger()
 	return &DefaultLogger{&l}
 }

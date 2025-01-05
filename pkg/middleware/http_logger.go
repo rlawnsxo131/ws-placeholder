@@ -42,7 +42,7 @@ type HTTPServeLogger struct {
 }
 
 func NewHTTPServeLogger(w io.Writer, f HTTPLogFormatter) *HTTPServeLogger {
-	l := zerolog.New(w).With().Caller().Timestamp().Logger()
+	l := zerolog.New(w).With().Caller().Logger()
 	return &HTTPServeLogger{
 		l: &l,
 		f: f,
@@ -100,7 +100,7 @@ func (le *DefaultHTTPLogEntry) Add(f func(e *zerolog.Event)) {
 
 func (le *DefaultHTTPLogEntry) Write(t time.Time) {
 	e := le.l.Log().
-		Str("time", t.Format(time.RFC3339Nano)).
+		Str("time", t.UTC().Format(time.RFC3339Nano)).
 		Str("request-id", chi_middleware.GetReqID(le.r.Context())).
 		Dur("elapsed(ms)", time.Since(t)).
 		Str("method", le.r.Method).

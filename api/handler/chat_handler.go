@@ -8,24 +8,26 @@ import (
 
 type chatHandler struct{}
 
-func NewChatHandler() *chatHandler {
+func NewChatHandler() Handler {
 	return &chatHandler{}
 }
 
 func (h *chatHandler) ApplyRoutes(r chi.Router) {
-	r.Route("/chat", func(r chi.Router) {
-		r.Route("/room", func(r chi.Router) {
-			r.Post("/", h.postRoom())
-			r.Delete("/{roomId}", h.deleteRoom())
-			r.Get("/list", h.getRoomList())
-		})
+	r.Route("/room", func(r chi.Router) {
+		r.Post("/", h.postRoom())
+		r.Delete("/{roomId}", h.deleteRoom())
 	})
+	r.Route("/rooms", func(r chi.Router) {
+		r.Get("/", h.getRooms())
+	})
+
 }
 
 func (h *chatHandler) postRoom() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("roomId"))
+		// json.NewEncoder(w).Encode(map[string]string{"name": "value"})
 	}
 }
 
@@ -37,7 +39,7 @@ func (h *chatHandler) deleteRoom() http.HandlerFunc {
 	}
 }
 
-func (h *chatHandler) getRoomList() http.HandlerFunc {
+func (h *chatHandler) getRooms() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("roomList"))

@@ -8,7 +8,7 @@ import (
 
 type rootHandler struct{}
 
-func NewRootHandler() *rootHandler {
+func NewRootHandler() Handler {
 	return &rootHandler{}
 }
 

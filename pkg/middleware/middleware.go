@@ -7,8 +7,8 @@ package middleware
 // r.Use(middleware.HTTPCompress(5))
 // r.Use(middleware.HTTPLogger(middleware.DefaultHTTPServeLogger))
 // r.Use(middleware.HTTPTimeout(time.Second * 3))
-// r.Use(middleware.HTTPContentType)
-// r.Use(middleware.HTTPRecoverer)
+// r.Use(middleware.HTTPCors(middleware.HTTPCorsConfig{ ... }))
+// r.Use(middleware.HTTPRecovery)
 
 // contextKey is a value for use with context.WithValue. It's used as
 // a pointer so it fits in an interface{} without allocation. This technique

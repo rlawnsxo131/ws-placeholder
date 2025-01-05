@@ -22,18 +22,20 @@ func Run(port string) {
 	r.Use(middleware.HTTPCompress(5))
 	r.Use(middleware.HTTPLogger(middleware.DefaultHTTPServeLogger))
 	r.Use(middleware.HTTPTimeout(time.Second * 3))
-	// @TODO Allow 헤더등 표준에 약간 아쉬운게 있어서 직접 구현하기
-	r.Use(middleware.CorsHandler(middleware.CorsOptions{
-		AllowedOrigins: []string{"https://*", "http://*"},
-		AllowedMethods: []string{"GET", "POST", "DELETE", "OPTIONS"},
-		AllowedHeaders: []string{
+	r.Use(middleware.HTTPCors(middleware.HTTPCorsConfig{
+		AllowOrigins: []string{"https://*", "http://*"},
+		AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodDelete, http.MethodOptions},
+		AllowHeaders: []string{
 			constants.HeaderContentType,
-			constants.HeaderAccessControlAllowCredentials,
+			constants.HeaderAccept,
+			constants.HeaderAuthorization,
+			constants.HeaderXRequestID,
 			constants.HeaderXForwardedFor,
 		},
-		MaxAge: 300,
+		AllowCredentials: true,
+		// MaxAge:           300,
 	}))
-	r.Use(middleware.HTTPRecoverer)
+	r.Use(middleware.HTTPRecovery)
 
 	// chi default handler
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
@@ -54,9 +56,12 @@ func Run(port string) {
 	handler.NewWSHandler().ApplyRoutes(ws)
 	r.Mount("/ws", ws)
 
-	api := chi.NewRouter().With(middleware.HTTPContentType)
-	handler.NewChatHandler().ApplyRoutes(api)
+	api := chi.NewRouter().With(middleware.HTTPContentType(middleware.HeaderJson))
 	r.Mount("/api", api)
+
+	chat := chi.NewRouter()
+	handler.NewChatHandler().ApplyRoutes(chat)
+	api.Mount("/chat", chat)
 
 	srv.Run(port)
 }

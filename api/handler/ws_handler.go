@@ -8,7 +8,7 @@ import (
 
 type wsHandler struct{}
 
-func NewWSHandler() *wsHandler {
+func NewWSHandler() Handler {
 	return &wsHandler{}
 }
 
