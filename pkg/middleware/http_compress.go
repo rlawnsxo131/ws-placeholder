@@ -64,7 +64,7 @@ func (cw *HTTPCompressWriter) Write(buf []byte) (int, error) {
 
 func gzipCompressPool(level int) sync.Pool {
 	return sync.Pool{
-		New: func() interface{} {
+		New: func() any {
 			w, err := gzip.NewWriterLevel(io.Discard, level)
 			if err != nil {
 				return err
@@ -76,7 +76,7 @@ func gzipCompressPool(level int) sync.Pool {
 
 // func deflateCompressPool(level int) sync.Pool {
 // 	return sync.Pool{
-// 		New: func() interface{} {
+// 		New: func() any {
 // 			w, err := flate.NewWriter(io.Discard, level)
 // 			if err != nil {
 // 				return err
