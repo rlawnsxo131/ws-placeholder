@@ -8,14 +8,17 @@ const (
 	// advertised as supported by the target resource. Returning an Allow header is mandatory
 	// for status 405 (method not found) and useful for the OPTIONS method in responses.
 	// See RFC 7231: https://datatracker.ietf.org/doc/html/rfc7231#section-7.4.1
-	HeaderAllow         = "Allow"
-	HeaderAuthorization = "Authorization"
-	HeaderVary          = "Vary"
-	HeaderOrigin        = "Origin"
-	HeaderXRequestID    = "X-Request-Id"
-	HeaderXForwardedFor = "X-Forwarded-For"
-	HeaderContentType   = "Content-Type"
-	HeaderCookie        = "Cookie"
+	HeaderAllow              = "Allow"
+	HeaderAuthorization      = "Authorization"
+	HeaderVary               = "Vary"
+	HeaderOrigin             = "Origin"
+	HeaderXRequestID         = "X-Request-Id"
+	HeaderXForwardedFor      = "X-Forwarded-For"
+	HeaderContentDisposition = "Content-Disposition"
+	HeaderContentEncoding    = "Content-Encoding"
+	HeaderContentLength      = "Content-Length"
+	HeaderContentType        = "Content-Type"
+	HeaderCookie             = "Cookie"
 
 	// Access control
 	HeaderAccessControlRequestMethod    = "Access-Control-Request-Method"
@@ -36,4 +39,8 @@ const (
 	HeaderContentSecurityPolicyReportOnly = "Content-Security-Policy-Report-Only"
 	HeaderXCSRFToken                      = "X-CSRF-Token"
 	HeaderReferrerPolicy                  = "Referrer-Policy"
+
+	// IP
+	HeaderTrueClientIP = "True-Client-IP"
+	HeaderXRealIP      = "X-Real-IP"
 )

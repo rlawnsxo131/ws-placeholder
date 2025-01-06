@@ -16,11 +16,10 @@ func Run(port string) {
 	srv := server.New()
 	r := srv.Router()
 
-	r.Use(middleware.HTTPRequestID)
-	r.Use(middleware.HTTPXRequestID)
-	r.Use(middleware.HTTPRealIP)
 	r.Use(middleware.HTTPCompress(5))
 	r.Use(middleware.HTTPLogger(middleware.DefaultHTTPServeLogger))
+	r.Use(middleware.HTTPRequestID)
+	r.Use(middleware.HTTPRealIP)
 	r.Use(middleware.HTTPTimeout(time.Second * 3))
 	r.Use(middleware.HTTPCors(middleware.HTTPCorsConfig{
 		AllowOrigins: []string{"https://*", "http://*"},
@@ -33,7 +32,7 @@ func Run(port string) {
 			constants.HeaderXForwardedFor,
 		},
 		AllowCredentials: true,
-		// MaxAge:           300,
+		MaxAge:           60,
 	}))
 	r.Use(middleware.HTTPRecovery)
 
@@ -53,7 +52,7 @@ func Run(port string) {
 	r.Mount("/", root)
 
 	internal := chi.NewRouter()
-	handler.NewInternalHander().ApplyRoutes(internal)
+	handler.NewInternalHandler().ApplyRoutes(internal)
 	r.Mount("/internal", internal)
 
 	ws := chi.NewRouter()

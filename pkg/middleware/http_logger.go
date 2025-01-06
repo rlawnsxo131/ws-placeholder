@@ -62,8 +62,8 @@ type HTTPLogEntry interface {
 	Write(t time.Time)
 }
 
-func GetHTTPLogEntry(r *http.Request) HTTPLogEntry {
-	entry, _ := r.Context().Value(HTTPLogEntryCtxKey).(HTTPLogEntry)
+func GetHTTPLogEntry(ctx context.Context) HTTPLogEntry {
+	entry, _ := ctx.Value(HTTPLogEntryCtxKey).(HTTPLogEntry)
 	return entry
 }
 
@@ -101,7 +101,7 @@ func (le *DefaultHTTPLogEntry) Add(f func(e *zerolog.Event)) {
 func (le *DefaultHTTPLogEntry) Write(t time.Time) {
 	e := le.l.Log().
 		Str("time", t.UTC().Format(time.RFC3339Nano)).
-		Str("request-id", chi_middleware.GetReqID(le.r.Context())).
+		Str("request-id", GetHTTPRequestID(le.r.Context())).
 		Dur("elapsed(ms)", time.Since(t)).
 		Str("method", le.r.Method).
 		Str("uri", le.r.RequestURI).

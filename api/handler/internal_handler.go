@@ -4,7 +4,7 @@ import "github.com/go-chi/chi/v5"
 
 type internalHandler struct{}
 
-func NewInternalHander() Handler {
+func NewInternalHandler() Handler {
 	return &internalHandler{}
 }
 

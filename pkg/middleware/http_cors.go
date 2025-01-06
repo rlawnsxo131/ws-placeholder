@@ -66,7 +66,6 @@ func HTTPCors(config HTTPCorsConfig) func(http.Handler) http.Handler {
 					return
 				}
 				w.WriteHeader(http.StatusNoContent)
-				w.Write([]byte(http.StatusText(http.StatusNoContent)))
 				return
 			}
 
@@ -108,7 +107,6 @@ func HTTPCors(config HTTPCorsConfig) func(http.Handler) http.Handler {
 					return
 				}
 				w.WriteHeader(http.StatusNoContent)
-				w.Write([]byte(http.StatusText(http.StatusNoContent)))
 				return
 			}
 
@@ -144,10 +142,8 @@ func HTTPCors(config HTTPCorsConfig) func(http.Handler) http.Handler {
 			}
 
 			w.WriteHeader(http.StatusNoContent)
-			w.Write([]byte(http.StatusText(http.StatusNoContent)))
 		})
 	}
-
 }
 
 type HTTPCorsConfig struct {

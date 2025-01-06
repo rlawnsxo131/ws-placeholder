@@ -16,7 +16,7 @@ func HTTPRecovery(next http.Handler) http.Handler {
 					// to the client is aborted, this should not be logged
 					panic(err)
 				}
-				GetHTTPLogEntry(r).Add(func(e *zerolog.Event) {
+				GetHTTPLogEntry(r.Context()).Add(func(e *zerolog.Event) {
 					e.Any("recover panic err", err).Str("statck", string(debug.Stack()))
 				})
 				w.WriteHeader(http.StatusInternalServerError)

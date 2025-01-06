@@ -1,13 +1,13 @@
 package middleware
 
 // [Full order example]
-// r.Use(middleware.HTTPRequestID)
-// r.Use(middleware.HTTPXRequestID)
-// r.Use(middleware.HTTPRealIP)
 // r.Use(middleware.HTTPCompress(5))
 // r.Use(middleware.HTTPLogger(middleware.DefaultHTTPServeLogger))
+// r.Use(middleware.HTTPRequestID)
+// r.Use(middleware.HTTPRealIP)
 // r.Use(middleware.HTTPTimeout(time.Second * 3))
 // r.Use(middleware.HTTPCors(middleware.HTTPCorsConfig{ ... }))
+// r.Use(middleware.HTTPContentType(middleware.HeaderJson))
 // r.Use(middleware.HTTPRecovery)
 
 // contextKey is a value for use with context.WithValue. It's used as

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -39,7 +40,13 @@ func (h *chatHandler) deleteRoom() http.HandlerFunc {
 
 func (h *chatHandler) getRooms() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		res := make([]string, 100)
+
+		for i := 0; i < 100; i++ {
+			res[i] = "roomList"
+		}
+
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("roomList"))
+		json.NewEncoder(w).Encode(res)
 	}
 }
