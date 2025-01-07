@@ -40,13 +40,26 @@ func (h *chatHandler) deleteRoom() http.HandlerFunc {
 
 func (h *chatHandler) getRooms() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		res := make([]string, 100)
+		// 3800 ~ 5000 / 1sec
+		// res := make([]string, 100)
 
-		for i := 0; i < 100; i++ {
-			res[i] = "roomList"
-		}
+		// for i := 0; i < 100; i++ {
+		// 	res[i] = "roomList"
+		// }
+		// w.WriteHeader(http.StatusOK)
+		// json.NewEncoder(w).Encode(res)
+
+		// 3800 ~ 7700 / 1sec
+		t := make(chan []string, 100)
+		res := make([]string, 100)
+		go func() {
+			for i := 0; i < 100; i++ {
+				res[i] = "roomList"
+			}
+		}()
+		t <- res
 
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(res)
+		json.NewEncoder(w).Encode(<-t)
 	}
 }
