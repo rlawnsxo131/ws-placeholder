@@ -49,8 +49,8 @@ func (h *chatHandler) getRooms() http.HandlerFunc {
 		// w.WriteHeader(http.StatusOK)
 		// json.NewEncoder(w).Encode(res)
 
-		// 3800 ~ 7700 / 1sec
-		t := make(chan []string, 100)
+		// 3800 ~ 7900 / 1sec
+		t := make(chan []string, 1)
 		res := make([]string, 100)
 		go func() {
 			for i := 0; i < 100; i++ {

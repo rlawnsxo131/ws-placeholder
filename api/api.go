@@ -22,8 +22,8 @@ func Run(port string) {
 		Level:     gzip.DefaultCompression,
 		MinLength: 2000,
 	}))
-	r.Use(middleware.HTTPLogger(middleware.DefaultHTTPServeLogger))
 	r.Use(middleware.HTTPRequestID)
+	r.Use(middleware.HTTPLogger(middleware.DefaultHTTPServeLogger))
 	r.Use(middleware.HTTPRealIP)
 	r.Use(middleware.HTTPTimeout(time.Second * 3))
 	r.Use(middleware.HTTPCors(middleware.HTTPCorsConfig{
