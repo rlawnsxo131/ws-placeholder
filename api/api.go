@@ -1,6 +1,7 @@
 package api
 
 import (
+	"compress/gzip"
 	"net/http"
 	"time"
 
@@ -17,7 +18,10 @@ func Run(port string) {
 	r := srv.Router()
 
 	r.Use(middleware.HTTPRecovery)
-	r.Use(middleware.HTTPCompress(5))
+	r.Use(middleware.HTTPCompress(middleware.HTTPCompressConfig{
+		Level:     gzip.DefaultCompression,
+		MinLength: 2000,
+	}))
 	r.Use(middleware.HTTPLogger(middleware.DefaultHTTPServeLogger))
 	r.Use(middleware.HTTPRequestID)
 	r.Use(middleware.HTTPRealIP)

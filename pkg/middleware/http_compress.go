@@ -1,9 +1,9 @@
 package middleware
 
 import (
+	"bytes"
 	"compress/gzip"
 	"io"
-	"log"
 	"net/http"
 	"strings"
 	"sync"
@@ -12,13 +12,13 @@ import (
 	"github.com/rlawnsxo131/ws-placeholder/pkg/lib/logger"
 )
 
-func HTTPCompress(level int) func(http.Handler) http.Handler {
+// @TODO 다시 다듬기
+func HTTPCompress(cfg HTTPCompressConfig) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		gzipScheme := "gzip"
-		gzipPool := gzipCompressPool(level)
+		gzipPool := gzipCompressPool(cfg.Level)
 
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			log.Println("compress")
 			w.Header().Add(pkg.HeaderVary, pkg.HeaderAcceptEncoding)
 
 			acceptEncoding := r.Header.Get(pkg.HeaderAcceptEncoding)
@@ -36,6 +36,7 @@ func HTTPCompress(level int) func(http.Handler) http.Handler {
 				return
 			}
 			gw.Reset(w)
+
 			defer func() {
 				if err := gw.Close(); err != nil {
 					logger.Default().Err(err).Send()
@@ -43,17 +44,33 @@ func HTTPCompress(level int) func(http.Handler) http.Handler {
 				gzipPool.Put(gw)
 			}()
 
-			next.ServeHTTP(&HTTPCompressWriter{Writer: gw, ResponseWriter: w}, r)
+			next.ServeHTTP(
+				&HTTPCompressWriter{
+					Writer:         gw,
+					ResponseWriter: w,
+					minLength:      cfg.MinLength,
+				},
+				r,
+			)
 		})
 	}
+}
+
+type HTTPCompressConfig struct {
+	Level     int
+	MinLength int
 }
 
 type HTTPCompressWriter struct {
 	io.Writer
 	http.ResponseWriter
+	minLength int
 }
 
 func (cw *HTTPCompressWriter) Write(buf []byte) (int, error) {
+	if cw.Header().Get(pkg.HeaderContentType) == "" {
+		cw.Header().Set(pkg.HeaderContentType, http.DetectContentType(buf))
+	}
 	return cw.Writer.Write(buf)
 }
 
@@ -65,6 +82,15 @@ func gzipCompressPool(level int) sync.Pool {
 				return err
 			}
 			return w
+		},
+	}
+}
+
+func bufferPool() sync.Pool {
+	return sync.Pool{
+		New: func() interface{} {
+			b := &bytes.Buffer{}
+			return b
 		},
 	}
 }
