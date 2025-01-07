@@ -1,4 +1,4 @@
-package constants
+package pkg
 
 // Headers
 const (
@@ -12,8 +12,6 @@ const (
 	HeaderAuthorization      = "Authorization"
 	HeaderVary               = "Vary"
 	HeaderOrigin             = "Origin"
-	HeaderXRequestID         = "X-Request-Id"
-	HeaderXForwardedFor      = "X-Forwarded-For"
 	HeaderContentDisposition = "Content-Disposition"
 	HeaderContentEncoding    = "Content-Encoding"
 	HeaderContentLength      = "Content-Length"
@@ -40,7 +38,9 @@ const (
 	HeaderXCSRFToken                      = "X-CSRF-Token"
 	HeaderReferrerPolicy                  = "Referrer-Policy"
 
-	// IP
-	HeaderTrueClientIP = "True-Client-IP"
-	HeaderXRealIP      = "X-Real-IP"
+	// Source
+	HeaderXRequestID    = "X-Request-Id"
+	HeaderXForwardedFor = "X-Forwarded-For"
+	HeaderTrueClientIP  = "True-Client-IP"
+	HeaderXRealIP       = "X-Real-IP"
 )

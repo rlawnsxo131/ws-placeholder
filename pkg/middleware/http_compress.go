@@ -3,37 +3,32 @@ package middleware
 import (
 	"compress/gzip"
 	"io"
+	"log"
 	"net/http"
 	"strings"
 	"sync"
 
-	"github.com/rlawnsxo131/ws-placeholder/pkg/constants"
+	"github.com/rlawnsxo131/ws-placeholder/pkg"
 	"github.com/rlawnsxo131/ws-placeholder/pkg/lib/logger"
 )
 
-const (
-	_gzipScheme    = "gzip"
-	_deflateScheme = "deflate"
-)
-
-// @TODO config 구현
-// deflate 지원할까 말까
 func HTTPCompress(level int) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
+		gzipScheme := "gzip"
 		gzipPool := gzipCompressPool(level)
-		// deflatePool := deflateCompressPool(level)
 
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Add(constants.HeaderVary, constants.HeaderAcceptEncoding)
+			log.Println("compress")
+			w.Header().Add(pkg.HeaderVary, pkg.HeaderAcceptEncoding)
 
-			acceptEncoding := r.Header.Get(constants.HeaderAcceptEncoding)
+			acceptEncoding := r.Header.Get(pkg.HeaderAcceptEncoding)
 
-			if !strings.Contains(acceptEncoding, _gzipScheme) {
+			if !strings.Contains(acceptEncoding, gzipScheme) {
 				next.ServeHTTP(w, r)
 				return
 			}
 
-			w.Header().Set(constants.HeaderContentEncoding, _gzipScheme)
+			w.Header().Set(pkg.HeaderContentEncoding, gzipScheme)
 
 			gw, ok := gzipPool.Get().(*gzip.Writer)
 			if !ok {
@@ -73,15 +68,3 @@ func gzipCompressPool(level int) sync.Pool {
 		},
 	}
 }
-
-// func deflateCompressPool(level int) sync.Pool {
-// 	return sync.Pool{
-// 		New: func() any {
-// 			w, err := flate.NewWriter(io.Discard, level)
-// 			if err != nil {
-// 				return err
-// 			}
-// 			return w
-// 		},
-// 	}
-// }

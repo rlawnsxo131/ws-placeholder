@@ -5,23 +5,21 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/rlawnsxo131/ws-placeholder/pkg/constants"
+	"github.com/rlawnsxo131/ws-placeholder/pkg"
 )
 
 func HTTPRealIP(h http.Handler) http.Handler {
-	fn := func(w http.ResponseWriter, r *http.Request) {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if rip := realIP(r); rip != "" {
 			r.RemoteAddr = rip
 		}
 		h.ServeHTTP(w, r)
-	}
-
-	return http.HandlerFunc(fn)
+	})
 }
 
-var trueClientIP = http.CanonicalHeaderKey(constants.HeaderTrueClientIP)
-var xForwardedFor = http.CanonicalHeaderKey(constants.HeaderXForwardedFor)
-var xRealIP = http.CanonicalHeaderKey(constants.HeaderXRealIP)
+var trueClientIP = http.CanonicalHeaderKey(pkg.HeaderTrueClientIP)
+var xForwardedFor = http.CanonicalHeaderKey(pkg.HeaderXForwardedFor)
+var xRealIP = http.CanonicalHeaderKey(pkg.HeaderXRealIP)
 
 func realIP(r *http.Request) string {
 	var ip string

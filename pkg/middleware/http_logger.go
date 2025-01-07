@@ -8,7 +8,7 @@ import (
 	"time"
 
 	chi_middleware "github.com/go-chi/chi/v5/middleware"
-	"github.com/rlawnsxo131/ws-placeholder/pkg/constants"
+	"github.com/rlawnsxo131/ws-placeholder/pkg"
 	"github.com/rs/zerolog"
 )
 
@@ -105,13 +105,13 @@ func (le *DefaultHTTPLogEntry) Write(t time.Time) {
 		Dur("elapsed(ms)", time.Since(t)).
 		Str("method", le.r.Method).
 		Str("uri", le.r.RequestURI).
-		Str("origin", le.r.Header.Get(constants.HeaderOrigin)).
+		Str("origin", le.r.Header.Get(pkg.HeaderOrigin)).
 		Str("host", le.r.Host).
 		Str("referer", le.r.Referer()).
 		Str("remote-ip", le.r.RemoteAddr).
-		Str("x-request-id", le.r.Header.Get(constants.HeaderXRequestID)).
-		Str("x-forwarded-for", le.r.Header.Get(constants.HeaderXForwardedFor)).
-		Str("cookie", le.r.Header.Get(constants.HeaderCookie))
+		Str("x-request-id", le.r.Header.Get(pkg.HeaderXRequestID)).
+		Str("x-forwarded-for", le.r.Header.Get(pkg.HeaderXForwardedFor)).
+		Str("cookie", le.r.Header.Get(pkg.HeaderCookie))
 
 	for _, f := range le.add {
 		f(e)

@@ -10,15 +10,10 @@ import (
 	"strings"
 	"sync/atomic"
 
-	"github.com/rlawnsxo131/ws-placeholder/pkg/constants"
+	"github.com/rlawnsxo131/ws-placeholder/pkg"
 )
 
 var HTTPRequestIDKey = &contextKey{"HTTPRequestIDKey"}
-
-var (
-	prefix string
-	reqid  uint64
-)
 
 func HTTPRequestID(next http.Handler) http.Handler {
 	hostname, err := os.Hostname()
@@ -33,16 +28,17 @@ func HTTPRequestID(next http.Handler) http.Handler {
 		b64 = strings.NewReplacer("+", "", "/", "").Replace(b64)
 	}
 
-	prefix = fmt.Sprintf("%s/%s", hostname, b64[0:10])
+	var reqid uint64 = 0
+	var prefix string = fmt.Sprintf("%s/%s", hostname, b64[0:10])
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		requestID := r.Header.Get(constants.HeaderXRequestID)
+		requestID := r.Header.Get(pkg.HeaderXRequestID)
 		if requestID == "" {
 			myid := atomic.AddUint64(&reqid, 1)
 			requestID = fmt.Sprintf("%s-%06d", prefix, myid)
 		}
 		// ex) hostname/qzmQUuE5WX-000001
-		r.Header.Set(constants.HeaderXRequestID, strings.Split(requestID, "/")[1])
+		r.Header.Set(pkg.HeaderXRequestID, strings.Split(requestID, "/")[1])
 		next.ServeHTTP(w, WithHTTPRequestID(r, requestID))
 	})
 }

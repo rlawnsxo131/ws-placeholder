@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/rlawnsxo131/ws-placeholder/pkg/constants"
+	"github.com/rlawnsxo131/ws-placeholder/pkg"
 	"github.com/rlawnsxo131/ws-placeholder/pkg/lib/logger"
 )
 
@@ -16,8 +16,8 @@ var DefaultHTTPCorsConfig = HTTPCorsConfig{
 	AllowOrigins: []string{"*"},
 	AllowMethods: []string{http.MethodGet},
 	AllowHeaders: []string{
-		constants.HeaderContentType,
-		constants.HeaderAccept,
+		pkg.HeaderContentType,
+		pkg.HeaderAccept,
 	},
 }
 
@@ -50,10 +50,10 @@ func HTTPCors(config HTTPCorsConfig) func(http.Handler) http.Handler {
 
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			origin := r.Header.Get(constants.HeaderOrigin)
+			origin := r.Header.Get(pkg.HeaderOrigin)
 			allowOrigin := ""
 
-			w.Header().Add(constants.HeaderVary, constants.HeaderOrigin)
+			w.Header().Add(pkg.HeaderVary, pkg.HeaderOrigin)
 
 			// Preflight request is an OPTIONS request, using three HTTP request headers: Access-Control-Request-Method,
 			// Access-Control-Request-Headers, and the Origin header. See: https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request
@@ -110,35 +110,35 @@ func HTTPCors(config HTTPCorsConfig) func(http.Handler) http.Handler {
 				return
 			}
 
-			w.Header().Set(constants.HeaderAccessControlAllowOrigin, allowOrigin)
+			w.Header().Set(pkg.HeaderAccessControlAllowOrigin, allowOrigin)
 			if config.AllowCredentials {
-				w.Header().Set(constants.HeaderAccessControlAllowCredentials, "true")
+				w.Header().Set(pkg.HeaderAccessControlAllowCredentials, "true")
 			}
 
 			// Simple request
 			if !preflight {
 				if exposeHeaders != "" {
-					w.Header().Set(constants.HeaderAccessControlExposeHeaders, exposeHeaders)
+					w.Header().Set(pkg.HeaderAccessControlExposeHeaders, exposeHeaders)
 				}
 				next.ServeHTTP(w, r)
 				return
 			}
 
 			// Preflight request
-			w.Header().Add(constants.HeaderVary, constants.HeaderAccessControlRequestMethod)
-			w.Header().Add(constants.HeaderVary, constants.HeaderAccessControlRequestHeaders)
-			w.Header().Set(constants.HeaderAccessControlAllowMethods, allowMethods)
+			w.Header().Add(pkg.HeaderVary, pkg.HeaderAccessControlRequestMethod)
+			w.Header().Add(pkg.HeaderVary, pkg.HeaderAccessControlRequestHeaders)
+			w.Header().Set(pkg.HeaderAccessControlAllowMethods, allowMethods)
 
 			if allowHeaders != "" {
-				w.Header().Set(constants.HeaderAccessControlAllowHeaders, allowHeaders)
+				w.Header().Set(pkg.HeaderAccessControlAllowHeaders, allowHeaders)
 			} else {
-				h := r.Header.Get(constants.HeaderAccessControlRequestHeaders)
+				h := r.Header.Get(pkg.HeaderAccessControlRequestHeaders)
 				if h != "" {
-					w.Header().Set(constants.HeaderAccessControlAllowHeaders, h)
+					w.Header().Set(pkg.HeaderAccessControlAllowHeaders, h)
 				}
 			}
 			if config.MaxAge != 0 {
-				w.Header().Set(constants.HeaderAccessControlMaxAge, maxAge)
+				w.Header().Set(pkg.HeaderAccessControlMaxAge, maxAge)
 			}
 
 			w.WriteHeader(http.StatusNoContent)

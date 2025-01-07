@@ -3,7 +3,7 @@ package middleware
 import (
 	"net/http"
 
-	"github.com/rlawnsxo131/ws-placeholder/pkg/constants"
+	"github.com/rlawnsxo131/ws-placeholder/pkg"
 )
 
 type HeaderContentType int
@@ -26,7 +26,7 @@ func (contentType HeaderContentType) String() string {
 func HTTPContentType(contentType HeaderContentType) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set(constants.HeaderContentType, HeaderContentType(contentType).String())
+			w.Header().Set(pkg.HeaderContentType, HeaderContentType(contentType).String())
 			next.ServeHTTP(w, r)
 		})
 	}

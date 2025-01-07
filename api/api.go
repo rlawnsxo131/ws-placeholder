@@ -8,7 +8,7 @@ import (
 
 	"github.com/rlawnsxo131/ws-placeholder/api/handler"
 	"github.com/rlawnsxo131/ws-placeholder/api/server"
-	"github.com/rlawnsxo131/ws-placeholder/pkg/constants"
+	"github.com/rlawnsxo131/ws-placeholder/pkg"
 	"github.com/rlawnsxo131/ws-placeholder/pkg/middleware"
 )
 
@@ -16,6 +16,7 @@ func Run(port string) {
 	srv := server.New()
 	r := srv.Router()
 
+	r.Use(middleware.HTTPRecovery)
 	r.Use(middleware.HTTPCompress(5))
 	r.Use(middleware.HTTPLogger(middleware.DefaultHTTPServeLogger))
 	r.Use(middleware.HTTPRequestID)
@@ -25,16 +26,15 @@ func Run(port string) {
 		AllowOrigins: []string{"https://*", "http://*"},
 		AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodDelete, http.MethodOptions},
 		AllowHeaders: []string{
-			constants.HeaderContentType,
-			constants.HeaderAccept,
-			constants.HeaderAuthorization,
-			constants.HeaderXRequestID,
-			constants.HeaderXForwardedFor,
+			pkg.HeaderContentType,
+			pkg.HeaderAccept,
+			pkg.HeaderAuthorization,
+			pkg.HeaderXRequestID,
+			pkg.HeaderXForwardedFor,
 		},
 		AllowCredentials: true,
 		MaxAge:           60,
 	}))
-	r.Use(middleware.HTTPRecovery)
 
 	// chi default handler
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
