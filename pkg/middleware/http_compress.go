@@ -79,6 +79,7 @@ func (cw *HTTPCompressWriter) Write(buf []byte) (int, error) {
 		return cw.Writer.Write(buf)
 	}
 
+	// uncompressed
 	cw.minLengthExceeded = false
 	if cw.wroteHeader {
 		cw.ResponseWriter.WriteHeader(cw.code)
