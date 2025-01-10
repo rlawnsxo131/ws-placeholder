@@ -55,8 +55,8 @@ func HTTPCompress(cfg HTTPCompressConfig) func(http.Handler) http.Handler {
 }
 
 type HTTPCompressConfig struct {
-	Level     int
-	MinLength int
+	Level     int // gzip compress level
+	MinLength int // byte lenth
 }
 
 type HTTPCompressWriter struct {

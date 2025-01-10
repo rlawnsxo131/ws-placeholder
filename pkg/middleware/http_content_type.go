@@ -9,13 +9,13 @@ import (
 type HeaderContentType int
 
 const (
-	HeaderJson HeaderContentType = iota + 1
-	HeaderText
+	HeaderText HeaderContentType = iota + 1
+	HeaderJson
 )
 
 var contentTypes = []string{
-	"application/json; charset=utf-8",
 	"plain/text; charset=utf-8",
+	"application/json; charset=utf-8",
 }
 
 func (contentType HeaderContentType) String() string {
