@@ -20,7 +20,7 @@ func Run(port string) {
 	r.Use(middleware.HTTPRecovery)
 	r.Use(middleware.HTTPCompress(middleware.HTTPCompressConfig{
 		Level:     gzip.DefaultCompression,
-		MinLength: 100,
+		MinLength: 500,
 	}))
 	r.Use(middleware.HTTPRequestID)
 	r.Use(middleware.HTTPLogger(middleware.DefaultHTTPServeLogger))

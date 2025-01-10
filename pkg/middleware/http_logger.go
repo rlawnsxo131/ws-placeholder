@@ -7,7 +7,6 @@ import (
 	"os"
 	"time"
 
-	chi_middleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/rlawnsxo131/ws-placeholder/pkg"
 	"github.com/rs/zerolog"
 )
@@ -21,10 +20,7 @@ func HTTPLogger(logger *HTTPServeLogger) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			entry := logger.NewLogEntry(r)
-			writer := NewHTTPLogResponseWriter(
-				chi_middleware.NewWrapResponseWriter(w, r.ProtoMajor),
-				entry,
-			)
+			writer := NewHTTPLogResponseWriter(w, entry)
 
 			t := time.Now()
 			defer func() {

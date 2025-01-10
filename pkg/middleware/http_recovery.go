@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"runtime/debug"
 
+	"github.com/rlawnsxo131/ws-placeholder/pkg/lib/logger"
 	"github.com/rs/zerolog"
 )
 
@@ -16,9 +17,17 @@ func HTTPRecovery(next http.Handler) http.Handler {
 					// to the client is aborted, this should not be logged
 					panic(err)
 				}
-				GetHTTPLogEntry(r.Context()).Add(func(e *zerolog.Event) {
-					e.Any("recover panic err", err).Str("statck", string(debug.Stack()))
-				})
+				if httpEntry := GetHTTPLogEntry(r.Context()); httpEntry != nil {
+					httpEntry.Add(func(e *zerolog.Event) {
+						e.Any("recover panic err", err).Str("statck", string(debug.Stack()))
+					})
+				} else {
+					logger.Default().Log().
+						Any("recover panic err", err).
+						Str("stack", string(debug.Stack())).
+						Send()
+				}
+
 				w.WriteHeader(http.StatusInternalServerError)
 				w.Write([]byte(http.StatusText(http.StatusInternalServerError)))
 			}

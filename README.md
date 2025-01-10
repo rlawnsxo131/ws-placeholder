@@ -1,5 +1,7 @@
 # performance
 
+- [pprof graph 참고문서](https://github.com/google/pprof/blob/main/doc/README.md#interpreting-the-callgraph)
+
 ```sh
 # 시각화를 위한 의존성 설치
 $ brew install graphviz
@@ -29,7 +31,7 @@ func main() {
 ```sh
 # 테스트를 위한 빌드및 애플리케이션 실행
 $ go build ./cmd/api/main.go
-$ go run ./main
+$ ./main
 
 # 트래픽 넣기
 # request count: 10000
@@ -56,4 +58,8 @@ $ go tool pprof -http 0.0.0.0:3000 http://0.0.0.0:6060/debug/pprof/heap
 # trace
 $ curl -o trace.out http://localhost:6060/debug/pprof/trace?seconds=5
 $ go tool trace trace.out
+
+# profile
+$ curl -o profile.out http://0.0.0.0:6060/debug/pprof/profile\?seconds\=180
+$ go tool pprof -http 0.0.0.0:3000 profile.out
 ```

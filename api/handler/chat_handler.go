@@ -56,8 +56,8 @@ func (h *chatHandler) getRooms() http.HandlerFunc {
 			for i := 0; i < 100; i++ {
 				res[i] = "roomList"
 			}
+			t <- res
 		}()
-		t <- res
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(<-t)

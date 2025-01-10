@@ -13,7 +13,6 @@ import (
 
 const _gzipScheme = "gzip"
 
-// @TODO 더 다듬기
 func HTTPCompress(cfg HTTPCompressConfig) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		gzipPool := gzipCompressPool(cfg.Level)
@@ -42,7 +41,7 @@ func HTTPCompress(cfg HTTPCompressConfig) func(http.Handler) http.Handler {
 			}
 
 			defer func() {
-				if cw.minLengthExceeded {
+				if cw.compressed {
 					if err := gw.Close(); err != nil {
 						logger.Default().Err(err).Send()
 					}
@@ -63,26 +62,26 @@ type HTTPCompressConfig struct {
 type HTTPCompressWriter struct {
 	io.Writer
 	http.ResponseWriter
-	minLength         int
-	code              int
-	wroteHeader       bool
-	minLengthExceeded bool
+	minLength   int
+	statusCode  int
+	wroteHeader bool
+	compressed  bool
 }
 
 func (cw *HTTPCompressWriter) Write(buf []byte) (int, error) {
 	if cw.minLength <= len(buf) {
-		cw.minLengthExceeded = true
+		cw.compressed = true
 		if cw.wroteHeader {
-			cw.WriteHeader(cw.code)
+			cw.WriteHeader(cw.statusCode)
 		}
 		cw.Header().Set(pkg.HeaderContentEncoding, _gzipScheme)
 		return cw.Writer.Write(buf)
 	}
 
 	// uncompressed
-	cw.minLengthExceeded = false
+	cw.compressed = false
 	if cw.wroteHeader {
-		cw.ResponseWriter.WriteHeader(cw.code)
+		cw.ResponseWriter.WriteHeader(cw.statusCode)
 	}
 	if cw.Header().Get(pkg.HeaderContentType) == "" {
 		cw.Header().Set(pkg.HeaderContentType, http.DetectContentType(buf))
@@ -97,7 +96,7 @@ func (cw *HTTPCompressWriter) WriteHeader(code int) {
 	cw.wroteHeader = true
 
 	// Delay writing of the header until we know if we'll actually compress the response
-	cw.code = code
+	cw.statusCode = code
 }
 
 func gzipCompressPool(level int) sync.Pool {

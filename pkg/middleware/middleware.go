@@ -2,7 +2,7 @@ package middleware
 
 // [Full order example]
 // r.Use(middleware.HTTPRecovery) // defer 3
-// r.Use(middleware.HTTPCompress(5)) // defer 2: clean up gzipWriter
+// r.Use(middleware.HTTPCompress(middleware.HTTPCompressConfig{ ... })) // defer 2: clean up gzipWriter
 // r.Use(middleware.HTTPRequestID) // context set id
 // r.Use(middleware.HTTPLogger(middleware.DefaultHTTPServeLogger)) // defer 1
 // r.Use(middleware.HTTPRealIP)

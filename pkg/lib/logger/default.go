@@ -10,15 +10,12 @@ import (
 )
 
 var (
-	_onceDefaultLogger      sync.Once
-	_singletonDefaultLogger *DefaultLogger
+	_onceDefaultLogger     sync.Once
+	singletonDefaultLogger *DefaultLogger
 )
 
 func Default() *DefaultLogger {
-	_onceDefaultLogger.Do(func() {
-		_singletonDefaultLogger = NewDefaultLogger(os.Stdout)
-	})
-	return _singletonDefaultLogger
+	return singletonDefaultLogger
 }
 
 type DefaultLogger struct {
@@ -29,4 +26,10 @@ func NewDefaultLogger(w io.Writer) *DefaultLogger {
 	// ko: +9 hours
 	l := zerolog.New(w).With().Caller().Str("time", time.Now().UTC().Format(time.RFC3339Nano)).Logger()
 	return &DefaultLogger{&l}
+}
+
+func init() {
+	_onceDefaultLogger.Do(func() {
+		singletonDefaultLogger = NewDefaultLogger(os.Stdout)
+	})
 }
