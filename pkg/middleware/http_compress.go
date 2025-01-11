@@ -74,6 +74,9 @@ func (cw *HTTPCompressWriter) Write(buf []byte) (int, error) {
 		if cw.wroteHeader {
 			cw.WriteHeader(cw.statusCode)
 		}
+		if cw.Header().Get(pkg.HeaderContentType) == "" {
+			cw.Header().Set(pkg.HeaderContentType, http.DetectContentType(buf))
+		}
 		cw.Header().Set(pkg.HeaderContentEncoding, _gzipScheme)
 		return cw.Writer.Write(buf)
 	}
